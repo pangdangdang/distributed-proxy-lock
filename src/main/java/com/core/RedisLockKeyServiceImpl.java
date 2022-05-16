@@ -5,16 +5,28 @@ import com.core.inter.RedisLockService;
 import com.exception.RedisLockException;
 import com.util.RedisLockUtil;
 import jodd.util.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.CodeSignature;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 @Service
+@Slf4j
 public class RedisLockKeyServiceImpl implements RedisLockService {
+
+    @Resource
+    private RedissonClient redissonClient;
+
+    @Resource
+    private RedisTemplate redisTemplate;
 
     @Override
     public String getKeyWithThreadLocal(ProceedingJoinPoint joinPoint, RedisLock redisLock) {
@@ -48,5 +60,53 @@ public class RedisLockKeyServiceImpl implements RedisLockService {
         }
         String lockKey = redisLock.key() + CommonUtil.getFieldValueByName(paramName, o);
         return lockKey;
+    }
+
+
+    public Object lockBySpringRedis(String lockKey, ProceedingJoinPoint joinPoint, RedisLock redisLock) throws Throwable {
+        try {
+            if (redisTemplate.opsForValue().setIfAbsent(lockKey, lockKey)) {
+                redisTemplate.expire(lockKey, redisLock.executeOut(), redisLock.timeUnit());
+                log.debug("代理加锁成功:{}", lockKey);
+                return joinPoint.proceed();
+            } else {
+                log.debug("代理加锁失败:{}", lockKey);
+            }
+        } catch (InterruptedException e) {
+            log.error("获取代理锁异常:{}", e);
+            throw e;
+        } finally {
+            redisTemplate.delete(lockKey);
+        }
+        return null;
+
+    }
+
+
+    public Object lockByRedisson(String lockKey, ProceedingJoinPoint joinPoint, RedisLock redisLock) throws Throwable {
+        RLock lock = redissonClient.getLock(lockKey);
+        try {
+            if (lock.tryLock(redisLock.waitOut(), redisLock.executeOut(), redisLock.timeUnit())) {
+                log.debug("代理加锁成功:{}", lockKey);
+                return joinPoint.proceed();
+            } else {
+                log.debug("代理加锁失败:{}", lockKey);
+            }
+        } catch (InterruptedException e) {
+            log.error("获取代理锁异常:{}", e);
+            throw e;
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+                log.debug("代理解锁:{}", lockKey);
+            }
+            //如果方法注解中开启自动清除，就去除
+            if (redisLock.atuoRemove()) {
+                RedisLockUtil.remove();
+                log.debug("自动清除RedisLockUtil:{}", lockKey);
+            }
+        }
+        return null;
+
     }
 }

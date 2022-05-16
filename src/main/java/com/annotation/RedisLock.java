@@ -20,4 +20,5 @@ public @interface RedisLock {
     String suffixKeyTypeEnum() default "no_suffix";
     String objectName() default "";
     String paramName() default "";
+    String redisEnum() default "redisson";
 }

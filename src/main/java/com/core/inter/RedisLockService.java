@@ -13,4 +13,8 @@ public interface RedisLockService {
 
     String getKeyWithParam(ProceedingJoinPoint joinPoint, RedisLock redisLock);
 
+    Object lockByRedisson(String lockKey, ProceedingJoinPoint joinPoint, RedisLock redisLock) throws Throwable;
+
+    Object lockBySpringRedis(String lockKey, ProceedingJoinPoint joinPoint, RedisLock redisLock) throws Throwable;
+
 }
