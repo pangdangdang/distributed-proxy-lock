@@ -6,7 +6,7 @@
 #### 软件架构
 基于Spring架构，默认使用redisson链接redis，可以更改配置使用其他redis工具
 
-redis注册：
+redis注册(redisson)：
 @Slf4j
 @Configuration
 public class RedisConfig {
@@ -32,6 +32,7 @@ public class RedisConfig {
     }
 }
 
+redis注册(spring.redis)：
 
 #### 使用说明
 
@@ -42,6 +43,7 @@ public class RedisConfig {
             log.info("测试加锁:{}", LockUtil.get() + i);
         }
     }
+    
 2.  参数中获取
     ①从某个入参对象的某个参数获取
         @RedisLock(key = "SHOP_LOCK_KEY", 
@@ -61,6 +63,7 @@ public class RedisConfig {
                 log.info("测试加锁:{}", LockUtil.get() + i);
             }
         }
+        
 3.  使用ThreadLocal获取
     @Slf4j
     @Service
