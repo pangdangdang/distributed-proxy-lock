@@ -48,7 +48,7 @@ redis注册(spring.redis)：
 
 1.  无后缀
 
-    @RedisLock(key = "SHOP_LOCK_KEY")
+    @RedisLock(key = "SHOP_LOCK_KEY")   
     public void test(ShopChainDTO shopChainDTO) {
         for (int i = 0; i < 6; i++) {
             log.info("测试加锁:{}", LockUtil.get() + i);
