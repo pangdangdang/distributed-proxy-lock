@@ -1,37 +1,92 @@
 # redislock
 
 #### 介绍
-基于redis的分布式代理锁
+基于redis的分布式代理锁，动态的锁后缀采用ThreadLocal或者参数名获取
 
 #### 软件架构
-软件架构说明
+基于Spring架构，默认使用redisson链接redis，可以更改配置使用其他redis工具
 
+redis注册：
+@Slf4j
+@Configuration
+public class RedisConfig {
+    @Value("${spring.redis.host}")
+    private String host;
+    @Value("${spring.redis.port}")
+    private String port;
+    @Value("${spring.redis.password}")
+    private String password;
+    @Value("${spring.redis.timeout}")
+    private int timeout;
+    @Value("${spring.redis.pool.min-idle}")
+    private int minIdleSize;
+    @Bean
+    public RedissonClient redissonClient() {
+        Config config = new Config();
+        config.useSingleServer()
+                .setAddress("redis://" + host + ":" + port)
+                .setPassword(StringUtils.isEmpty(password) ? null : password)
+                .setTimeout(timeout)
+                .setConnectionMinimumIdleSize(minIdleSize);
+        return Redisson.create(config);
+    }
+}
 
-#### 安装教程
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  无后缀
+    @RedisLock(key = "SHOP_LOCK_KEY")
+    public void test(ShopChainDTO shopChainDTO) {
+        for (int i = 0; i < 6; i++) {
+            log.info("测试加锁:{}", LockUtil.get() + i);
+        }
+    }
+2.  参数中获取
+    ①从某个入参对象的某个参数获取
+        @RedisLock(key = "SHOP_LOCK_KEY", 
+            suffixKeyTypeEnum = "param"
+            objectName = "shopChainDTO",
+            paramName = "shopId")
+        public void test(ShopChainDTO shopChainDTO) {
+            for (int i = 0; i < 6; i++) {
+                log.info("测试加锁:{}", LockUtil.get() + i);
+            }
+        }
+    ②从某个入参对象获取
+        @RedisLock(key = "SHOP_LOCK_KEY", 
+            objectName = "shopId")
+        public void test(LocalDateTime onlineTime, String shopId) {
+            for (int i = 0; i < 6; i++) {
+                log.info("测试加锁:{}", LockUtil.get() + i);
+            }
+        }
+3.  使用ThreadLocal获取
+    @Slf4j
+    @Service
+    public class ShopServiceImpl implements ShopService {
+        @RedisLock(key = "SHOP_LOCK_KEY", 
+            suffixKeyTypeEnum = "thread_local")
+        public void test(ShopChainDTO shopChainDTO) {
+            for (int i = 0; i < 6; i++) {
+                log.info("测试加锁:{}", LockUtil.get() + i);
+            }
+        }
+    }
+    
+    @RestController
+    @RequestMapping("shop")
+    public class ShopController {
+        
+        @Resource
+        private ShopService shopService;
 
-#### 参与贡献
+        @PostMapping("/online")
+        @MethodLogger
+        public void run(@RequestBody @Validated ShopChainDTO dto) {
+            LockUtil.set(dto.getShopId());
+            shopService.test(dto);
+        }
+    }
+    
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
-
-
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
