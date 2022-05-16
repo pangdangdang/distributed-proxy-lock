@@ -49,11 +49,11 @@ redis注册(spring.redis)：
 1.  无后缀
 
     @RedisLock(key = "SHOP_LOCK_KEY")   
-    public void test(ShopChainDTO shopChainDTO) {
-        for (int i = 0; i < 6; i++) {
-            log.info("测试加锁:{}", LockUtil.get() + i);
-        }
-    }
+    public void test(ShopChainDTO shopChainDTO) {   
+        for (int i = 0; i < 6; i++) {   
+            log.info("测试加锁:{}", LockUtil.get() + i);    
+        }   
+    }   
     
 2.  参数中获取
 
@@ -62,51 +62,51 @@ redis注册(spring.redis)：
         @RedisLock(key = "SHOP_LOCK_KEY", 
             suffixKeyTypeEnum = "param"
             objectName = "shopChainDTO",
-            paramName = "shopId")
-        public void test(ShopChainDTO shopChainDTO) {
-            for (int i = 0; i < 6; i++) {
-                log.info("测试加锁:{}", LockUtil.get() + i);
-            }
-        }
+            paramName = "shopId")   
+        public void test(ShopChainDTO shopChainDTO) {   
+            for (int i = 0; i < 6; i++) {   
+                log.info("测试加锁:{}", LockUtil.get() + i);    
+            }   
+        }   
         
     ②从某个入参对象获取
     
         @RedisLock(key = "SHOP_LOCK_KEY", 
-            objectName = "shopId")
-        public void test(LocalDateTime onlineTime, String shopId) {
-            for (int i = 0; i < 6; i++) {
-                log.info("测试加锁:{}", LockUtil.get() + i);
-            }
-        }
+            objectName = "shopId")  
+        public void test(LocalDateTime onlineTime, String shopId) { 
+            for (int i = 0; i < 6; i++) {   
+                log.info("测试加锁:{}", LockUtil.get() + i);    
+            }   
+        }   
         
 3.  使用ThreadLocal获取
 
-    @Slf4j
-    @Service
-    public class ShopServiceImpl implements ShopService {
+    @Slf4j  
+    @Service    
+    public class ShopServiceImpl implements ShopService {   
     
         @RedisLock(key = "SHOP_LOCK_KEY", 
-            suffixKeyTypeEnum = "thread_local")
-        public void test(ShopChainDTO shopChainDTO) {
-            for (int i = 0; i < 6; i++) {
-                log.info("测试加锁:{}", LockUtil.get() + i);
-            }
-        }
+            suffixKeyTypeEnum = "thread_local") 
+        public void test(ShopChainDTO shopChainDTO) {   
+            for (int i = 0; i < 6; i++) {   
+                log.info("测试加锁:{}", LockUtil.get() + i);    
+            }   
+        }   
         
     }
     
-    @RestController
-    @RequestMapping("shop")
-    public class ShopController {
+    @RestController 
+    @RequestMapping("shop") 
+    public class ShopController {   
         
-        @Resource
-        private ShopService shopService;
+        @Resource   
+        private ShopService shopService;    
 
-        @PostMapping("/online")
-        @MethodLogger
-        public void run(@RequestBody @Validated ShopChainDTO dto) {
-            LockUtil.set(dto.getShopId());
-            shopService.test(dto);
+        @PostMapping("/online") 
+        @MethodLogger   
+        public void run(@RequestBody @Validated ShopChainDTO dto) { 
+            LockUtil.set(dto.getShopId());  
+            shopService.test(dto);  
         }
     }
     
