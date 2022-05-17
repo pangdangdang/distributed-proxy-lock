@@ -60,7 +60,7 @@ redis注册(spring.redis)：
     ①从某个入参对象的某个参数获取
     
         @RedisLock(key = "SHOP_LOCK_KEY", 
-            suffixKeyTypeEnum = "param"
+            suffixKeyTypeEnum = "param",
             objectName = "shopChainDTO",
             paramName = "shopId")   
         public void test(ShopChainDTO shopChainDTO) {   
@@ -72,6 +72,7 @@ redis注册(spring.redis)：
     ②从某个入参对象获取
     
         @RedisLock(key = "SHOP_LOCK_KEY", 
+            suffixKeyTypeEnum = "param",
             objectName = "shopId")  
         public void test(LocalDateTime onlineTime, String shopId) { 
             for (int i = 0; i < 6; i++) {   
