@@ -1,5 +1,6 @@
 package com.annotation;
 
+import com.core.RedisLockCommonUtil;
 import com.enums.RedisLockSuffixKeyTypeEnum;
 
 import java.lang.annotation.*;
@@ -17,8 +18,8 @@ public @interface RedisLock {
     long executeOut() default 60;
     TimeUnit timeUnit() default TimeUnit.SECONDS;
     boolean atuoRemove() default true;
-    String suffixKeyTypeEnum() default "no_suffix";
+    String suffixKeyTypeEnum() default RedisLockCommonUtil.NO_SUFFIX;
     String objectName() default "";
     String paramName() default "";
-    String redisEnum() default "redisson";
+    String redisEnum() default RedisLockCommonUtil.REDISSON;
 }

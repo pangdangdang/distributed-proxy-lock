@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 @Slf4j
@@ -58,7 +57,7 @@ public class RedisLockKeyServiceImpl implements RedisLockService {
         if (StringUtil.isBlank(paramName)) {
             return redisLock.key() + o.toString();
         }
-        String lockKey = redisLock.key() + CommonUtil.getFieldValueByName(paramName, o);
+        String lockKey = redisLock.key() + RedisLockCommonUtil.getFieldValueByName(paramName, o);
         return lockKey;
     }
 

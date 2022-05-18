@@ -6,7 +6,7 @@
 
 #### 软件架构
 
-基于Spring架构，默认使用redisson链接redis，可以更改配置使用其他redis工具
+SpringBoot，默认使用redisson链接redis，可以更改注解参数使用Spring redis工具
 
 redis注册(redisson)：
 
@@ -60,7 +60,7 @@ redis注册(spring.redis)：
     ①从某个入参对象的某个参数获取
     
         @RedisLock(key = "SHOP_LOCK_KEY", 
-            suffixKeyTypeEnum = "param",
+            suffixKeyTypeEnum = RedisLockCommonUtil.PARAM,
             objectName = "shopChainDTO",
             paramName = "shopId")   
         public void test(ShopChainDTO shopChainDTO) {   
@@ -72,7 +72,7 @@ redis注册(spring.redis)：
     ②从某个入参对象获取
     
         @RedisLock(key = "SHOP_LOCK_KEY", 
-            suffixKeyTypeEnum = "param",
+            suffixKeyTypeEnum = RedisLockCommonUtil.PARAM,
             objectName = "shopId")  
         public void test(LocalDateTime onlineTime, String shopId) { 
             for (int i = 0; i < 6; i++) {   
@@ -87,7 +87,7 @@ redis注册(spring.redis)：
     public class ShopServiceImpl implements ShopService {   
     
         @RedisLock(key = "SHOP_LOCK_KEY", 
-            suffixKeyTypeEnum = "thread_local") 
+            suffixKeyTypeEnum = RedisLockCommonUtil.THREAD_LOCAL) 
         public void test(ShopChainDTO shopChainDTO) {   
             for (int i = 0; i < 6; i++) {   
                 log.info("测试加锁:{}", LockUtil.get() + i);    

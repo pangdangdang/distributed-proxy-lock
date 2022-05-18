@@ -9,7 +9,17 @@ import java.lang.reflect.Method;
  * 共用类
  */
 @Service
-public class CommonUtil {
+public class RedisLockCommonUtil {
+
+    public static final String REDISSON = "redisson";
+
+    public static final String SPRING_REDIS = "spring_redis";
+
+    public static final String NO_SUFFIX = "no_suffix";
+
+    public static final String THREAD_LOCAL = "thread_local";
+
+    public static final String PARAM = "param";
 
     public static Object getFieldValueByName(String fieldName, Object o) {
         try {
