@@ -17,7 +17,6 @@ import javax.annotation.Resource;
 /**
  * 分布式锁，切面处理类
  */
-@Slf4j
 @Aspect
 @Component
 public class RedisLockAspect {

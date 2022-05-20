@@ -8,7 +8,6 @@ import java.lang.reflect.Method;
 /**
  * 共用类
  */
-@Service
 public class RedisLockCommonUtil {
 
     public static final String REDISSON = "redisson";
