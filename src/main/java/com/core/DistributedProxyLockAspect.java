@@ -21,7 +21,7 @@ import javax.annotation.Resource;
 public class DistributedProxyLockAspect {
 
     @Resource
-    private DistributedProxyLockService redisLockService;
+    private DistributedProxyLockService distributedProxyLockService;
 
     @Pointcut("@annotation(com.annotation.DistributedProxyLock)")
     public void lockPointCut() {
@@ -34,13 +34,13 @@ public class DistributedProxyLockAspect {
             DistributedProxyLockSuffixKeyTypeEnum suffixKeyTypeEnum = DistributedProxyLockSuffixKeyTypeEnum.of(distributedProxyLock.suffixKeyTypeEnum());
             switch (suffixKeyTypeEnum) {
                 case PARAM:
-                    lockKey = redisLockService.getKeyWithParam(joinPoint, distributedProxyLock);
+                    lockKey = distributedProxyLockService.getKeyWithParam(joinPoint, distributedProxyLock);
                     break;
                 case NO_SUFFIX:
                     lockKey = distributedProxyLock.key();
                     break;
                 case THREAD_LOCAL:
-                    lockKey = redisLockService.getKeyWithThreadLocal(joinPoint, distributedProxyLock);
+                    lockKey = distributedProxyLockService.getKeyWithThreadLocal(joinPoint, distributedProxyLock);
                     break;
                 default:
                     throw new DistributedProxyLockException("未知后缀获取类型" + distributedProxyLock.suffixKeyTypeEnum());
@@ -52,9 +52,9 @@ public class DistributedProxyLockAspect {
         LockConnectionEnum lockConnectionEnum = LockConnectionEnum.of(distributedProxyLock.lockConnectionEnum());
         switch (lockConnectionEnum) {
             case REDISSON:
-                return redisLockService.lockByRedisson(lockKey, joinPoint, distributedProxyLock);
+                return distributedProxyLockService.lockByRedisson(lockKey, joinPoint, distributedProxyLock);
             case SPRING_REDIS:
-                return redisLockService.lockBySpringRedis(lockKey, joinPoint, distributedProxyLock);
+                return distributedProxyLockService.lockBySpringRedis(lockKey, joinPoint, distributedProxyLock);
             default:
                 throw new DistributedProxyLockException("未知redis工具" + distributedProxyLock.lockConnectionEnum());
         }
