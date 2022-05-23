@@ -10,6 +10,8 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.CodeSignature;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +20,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-@Slf4j
 public class DistributedProxyLockKeyServiceImpl implements DistributedProxyLockService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DistributedProxyLockKeyServiceImpl.class);
 
     @Resource
     private RedissonClient redissonClient;
@@ -66,13 +69,13 @@ public class DistributedProxyLockKeyServiceImpl implements DistributedProxyLockS
         try {
             if (redisTemplate.opsForValue().setIfAbsent(lockKey, lockKey)) {
                 redisTemplate.expire(lockKey, distributedProxyLock.executeOut(), distributedProxyLock.timeUnit());
-                log.debug("代理加锁成功:{}", lockKey);
+                LOGGER.debug("代理加锁成功:{}", lockKey);
                 return joinPoint.proceed();
             } else {
-                log.debug("代理加锁失败:{}", lockKey);
+                LOGGER.debug("代理加锁失败:{}", lockKey);
             }
         } catch (InterruptedException e) {
-            log.error("获取代理锁异常:{}", e);
+            LOGGER.error("获取代理锁异常:{}", e);
             throw e;
         } finally {
             redisTemplate.delete(lockKey);
@@ -86,23 +89,23 @@ public class DistributedProxyLockKeyServiceImpl implements DistributedProxyLockS
         RLock lock = redissonClient.getLock(lockKey);
         try {
             if (lock.tryLock(distributedProxyLock.waitOut(), distributedProxyLock.executeOut(), distributedProxyLock.timeUnit())) {
-                log.debug("代理加锁成功:{}", lockKey);
+                LOGGER.debug("代理加锁成功:{}", lockKey);
                 return joinPoint.proceed();
             } else {
-                log.debug("代理加锁失败:{}", lockKey);
+                LOGGER.debug("代理加锁失败:{}", lockKey);
             }
         } catch (InterruptedException e) {
-            log.error("获取代理锁异常:{}", e);
+            LOGGER.error("获取代理锁异常:{}", e);
             throw e;
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
-                log.debug("代理解锁:{}", lockKey);
+                LOGGER.debug("代理解锁:{}", lockKey);
             }
             //如果方法注解中开启自动清除，就去除
             if (distributedProxyLock.atuoRemove()) {
                 DistributedProxyLockUtil.remove();
-                log.debug("自动清除DistributedProxyLockUtil:{}", lockKey);
+                LOGGER.debug("自动清除DistributedProxyLockUtil:{}", lockKey);
             }
         }
         return null;
