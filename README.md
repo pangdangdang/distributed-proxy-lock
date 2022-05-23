@@ -51,7 +51,7 @@ redis注册(spring.redis)：
     @DistributedProxyLock(key = "SHOP_LOCK_KEY")   
     public void test(ShopChainDTO shopChainDTO) {   
         for (int i = 0; i < 6; i++) {   
-            log.info("测试加锁:{}", LockUtil.get() + i);    
+            log.info("测试加锁:{}", DistributedProxyLockUtil.get() + i);    
         }   
     }   
     
@@ -65,7 +65,7 @@ redis注册(spring.redis)：
             paramName = "shopId")   
         public void test(ShopChainDTO shopChainDTO) {   
             for (int i = 0; i < 6; i++) {   
-                log.info("测试加锁:{}", LockUtil.get() + i);    
+                log.info("测试加锁:{}", DistributedProxyLockUtil.get() + i);    
             }   
         }   
         
@@ -76,7 +76,7 @@ redis注册(spring.redis)：
             objectName = "shopId")  
         public void test(LocalDateTime onlineTime, String shopId) { 
             for (int i = 0; i < 6; i++) {   
-                log.info("测试加锁:{}", LockUtil.get() + i);    
+                log.info("测试加锁:{}", DistributedProxyLockUtil.get() + i);    
             }   
         }   
         
@@ -90,7 +90,7 @@ redis注册(spring.redis)：
             suffixKeyTypeEnum = DistributedProxyLockCommonUtil.THREAD_LOCAL) 
         public void test(ShopChainDTO shopChainDTO) {   
             for (int i = 0; i < 6; i++) {   
-                log.info("测试加锁:{}", LockUtil.get() + i);    
+                log.info("测试加锁:{}", DistributedProxyLockUtil.get() + i);    
             }   
         }   
         
@@ -106,7 +106,7 @@ redis注册(spring.redis)：
         @PostMapping("/online") 
         @MethodLogger   
         public void run(@RequestBody @Validated ShopChainDTO dto) { 
-            LockUtil.set(dto.getShopId());  
+            DistributedProxyLockUtil.set(dto.getShopId());  
             shopService.test(dto);  
         }
     }
@@ -114,10 +114,10 @@ redis注册(spring.redis)：
 4.  无后缀（Spring redis加锁）
 
     @DistributedProxyLock(key = "SHOP_LOCK_KEY",
-        redisEnum = DistributedProxyLockCommonUtil.SPRING_REDIS)   
+        lockConnectionEnum = DistributedProxyLockCommonUtil.SPRING_REDIS)   
     public void test(ShopChainDTO shopChainDTO) {   
         for (int i = 0; i < 6; i++) {   
-            log.info("测试加锁:{}", LockUtil.get() + i);    
+            log.info("测试加锁:{}", DistributedProxyLockUtil.get() + i);    
         }   
     }   
     
@@ -129,10 +129,10 @@ redis注册(spring.redis)：
             suffixKeyTypeEnum = DistributedProxyLockCommonUtil.PARAM,
             objectName = "shopChainDTO",
             paramName = "shopId",
-            redisEnum = DistributedProxyLockCommonUtil.SPRING_REDIS)   
+            lockConnectionEnum = DistributedProxyLockCommonUtil.SPRING_REDIS)   
         public void test(ShopChainDTO shopChainDTO) {   
             for (int i = 0; i < 6; i++) {   
-                log.info("测试加锁:{}", LockUtil.get() + i);    
+                log.info("测试加锁:{}", DistributedProxyLockUtil.get() + i);    
             }   
         }   
         
@@ -141,10 +141,10 @@ redis注册(spring.redis)：
         @DistributedProxyLock(key = "SHOP_LOCK_KEY", 
             suffixKeyTypeEnum = DistributedProxyLockCommonUtil.PARAM,
             objectName = "shopId",
-            redisEnum = DistributedProxyLockCommonUtil.SPRING_REDIS)  
+            lockConnectionEnum = DistributedProxyLockCommonUtil.SPRING_REDIS)  
         public void test(LocalDateTime onlineTime, String shopId) { 
             for (int i = 0; i < 6; i++) {   
-                log.info("测试加锁:{}", LockUtil.get() + i);    
+                log.info("测试加锁:{}", DistributedProxyLockUtil.get() + i);    
             }   
         }   
         
@@ -156,10 +156,10 @@ redis注册(spring.redis)：
     
         @DistributedProxyLock(key = "SHOP_LOCK_KEY", 
             suffixKeyTypeEnum = DistributedProxyLockCommonUtil.THREAD_LOCAL,
-             redisEnum = DistributedProxyLockCommonUtil.SPRING_REDIS) 
+             lockConnectionEnum = DistributedProxyLockCommonUtil.SPRING_REDIS) 
         public void test(ShopChainDTO shopChainDTO) {   
             for (int i = 0; i < 6; i++) {   
-                log.info("测试加锁:{}", LockUtil.get() + i);    
+                log.info("测试加锁:{}", DistributedProxyLockUtil.get() + i);    
             }   
         }   
         
@@ -175,7 +175,7 @@ redis注册(spring.redis)：
         @PostMapping("/online") 
         @MethodLogger   
         public void run(@RequestBody @Validated ShopChainDTO dto) { 
-            LockUtil.set(dto.getShopId());  
+            DistributedProxyLockUtil.set(dto.getShopId());  
             shopService.test(dto);  
         }
     }
