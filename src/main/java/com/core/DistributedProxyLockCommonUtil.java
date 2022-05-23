@@ -1,13 +1,13 @@
 package com.core;
 
-import com.exception.RedisLockException;
+import com.exception.DistributedProxyLockException;
 
 import java.lang.reflect.Method;
 
 /**
  * 共用类
  */
-public class RedisLockCommonUtil {
+public class DistributedProxyLockCommonUtil {
 
     public static final String REDISSON = "redisson";
 
@@ -29,7 +29,7 @@ public class RedisLockCommonUtil {
             Object value = method.invoke(o, new Object[]{});
             return value;
         } catch (Exception e) {
-            throw new RedisLockException("获取属性值失败" + e);
+            throw new DistributedProxyLockException("获取属性值失败" + e);
         }
     }
 }

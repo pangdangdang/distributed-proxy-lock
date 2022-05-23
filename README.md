@@ -2,7 +2,7 @@
 
 #### 介绍
 
-基于redis的分布式代理锁，动态的锁后缀采用ThreadLocal或者参数名获取
+分布式代理锁，动态的锁后缀采用ThreadLocal或者参数名获取 锁粒度自定义选择，目前实现基于redis，后续扩展zk等
 
 #### 软件架构
 
@@ -48,7 +48,7 @@ redis注册(spring.redis)：
 
 1.  无后缀（redisson加锁）
 
-    @RedisLock(key = "SHOP_LOCK_KEY")   
+    @DistributedProxyLock(key = "SHOP_LOCK_KEY")   
     public void test(ShopChainDTO shopChainDTO) {   
         for (int i = 0; i < 6; i++) {   
             log.info("测试加锁:{}", LockUtil.get() + i);    
@@ -59,8 +59,8 @@ redis注册(spring.redis)：
 
     ①从某个入参对象的某个参数获取
     
-        @RedisLock(key = "SHOP_LOCK_KEY", 
-            suffixKeyTypeEnum = RedisLockCommonUtil.PARAM,
+        @DistributedProxyLock(key = "SHOP_LOCK_KEY", 
+            suffixKeyTypeEnum = DistributedProxyLockCommonUtil.PARAM,
             objectName = "shopChainDTO",
             paramName = "shopId")   
         public void test(ShopChainDTO shopChainDTO) {   
@@ -71,8 +71,8 @@ redis注册(spring.redis)：
         
     ②从某个入参对象获取
     
-        @RedisLock(key = "SHOP_LOCK_KEY", 
-            suffixKeyTypeEnum = RedisLockCommonUtil.PARAM,
+        @DistributedProxyLock(key = "SHOP_LOCK_KEY", 
+            suffixKeyTypeEnum = DistributedProxyLockCommonUtil.PARAM,
             objectName = "shopId")  
         public void test(LocalDateTime onlineTime, String shopId) { 
             for (int i = 0; i < 6; i++) {   
@@ -86,8 +86,8 @@ redis注册(spring.redis)：
     @Service    
     public class ShopServiceImpl implements ShopService {   
     
-        @RedisLock(key = "SHOP_LOCK_KEY", 
-            suffixKeyTypeEnum = RedisLockCommonUtil.THREAD_LOCAL) 
+        @DistributedProxyLock(key = "SHOP_LOCK_KEY", 
+            suffixKeyTypeEnum = DistributedProxyLockCommonUtil.THREAD_LOCAL) 
         public void test(ShopChainDTO shopChainDTO) {   
             for (int i = 0; i < 6; i++) {   
                 log.info("测试加锁:{}", LockUtil.get() + i);    
@@ -113,8 +113,8 @@ redis注册(spring.redis)：
     
 4.  无后缀（Spring redis加锁）
 
-    @RedisLock(key = "SHOP_LOCK_KEY",
-        redisEnum = RedisLockCommonUtil.SPRING_REDIS)   
+    @DistributedProxyLock(key = "SHOP_LOCK_KEY",
+        redisEnum = DistributedProxyLockCommonUtil.SPRING_REDIS)   
     public void test(ShopChainDTO shopChainDTO) {   
         for (int i = 0; i < 6; i++) {   
             log.info("测试加锁:{}", LockUtil.get() + i);    
@@ -125,11 +125,11 @@ redis注册(spring.redis)：
 
     ①从某个入参对象的某个参数获取
     
-        @RedisLock(key = "SHOP_LOCK_KEY", 
-            suffixKeyTypeEnum = RedisLockCommonUtil.PARAM,
+        @DistributedProxyLock(key = "SHOP_LOCK_KEY", 
+            suffixKeyTypeEnum = DistributedProxyLockCommonUtil.PARAM,
             objectName = "shopChainDTO",
             paramName = "shopId",
-            redisEnum = RedisLockCommonUtil.SPRING_REDIS)   
+            redisEnum = DistributedProxyLockCommonUtil.SPRING_REDIS)   
         public void test(ShopChainDTO shopChainDTO) {   
             for (int i = 0; i < 6; i++) {   
                 log.info("测试加锁:{}", LockUtil.get() + i);    
@@ -138,10 +138,10 @@ redis注册(spring.redis)：
         
     ②从某个入参对象获取
     
-        @RedisLock(key = "SHOP_LOCK_KEY", 
-            suffixKeyTypeEnum = RedisLockCommonUtil.PARAM,
+        @DistributedProxyLock(key = "SHOP_LOCK_KEY", 
+            suffixKeyTypeEnum = DistributedProxyLockCommonUtil.PARAM,
             objectName = "shopId",
-            redisEnum = RedisLockCommonUtil.SPRING_REDIS)  
+            redisEnum = DistributedProxyLockCommonUtil.SPRING_REDIS)  
         public void test(LocalDateTime onlineTime, String shopId) { 
             for (int i = 0; i < 6; i++) {   
                 log.info("测试加锁:{}", LockUtil.get() + i);    
@@ -154,9 +154,9 @@ redis注册(spring.redis)：
     @Service    
     public class ShopServiceImpl implements ShopService {   
     
-        @RedisLock(key = "SHOP_LOCK_KEY", 
-            suffixKeyTypeEnum = RedisLockCommonUtil.THREAD_LOCAL,
-             redisEnum = RedisLockCommonUtil.SPRING_REDIS) 
+        @DistributedProxyLock(key = "SHOP_LOCK_KEY", 
+            suffixKeyTypeEnum = DistributedProxyLockCommonUtil.THREAD_LOCAL,
+             redisEnum = DistributedProxyLockCommonUtil.SPRING_REDIS) 
         public void test(ShopChainDTO shopChainDTO) {   
             for (int i = 0; i < 6; i++) {   
                 log.info("测试加锁:{}", LockUtil.get() + i);    

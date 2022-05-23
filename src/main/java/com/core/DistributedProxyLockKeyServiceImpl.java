@@ -1,9 +1,9 @@
 package com.core;
 
-import com.annotation.RedisLock;
-import com.core.inter.RedisLockService;
-import com.exception.RedisLockException;
-import com.util.RedisLockUtil;
+import com.annotation.DistributedProxyLock;
+import com.core.inter.DistributedProxyLockService;
+import com.exception.DistributedProxyLockException;
+import com.util.DistributedProxyLockUtil;
 import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -19,7 +19,7 @@ import java.util.Map;
 
 @Service
 @Slf4j
-public class RedisLockKeyServiceImpl implements RedisLockService {
+public class DistributedProxyLockKeyServiceImpl implements DistributedProxyLockService {
 
     @Resource
     private RedissonClient redissonClient;
@@ -28,22 +28,22 @@ public class RedisLockKeyServiceImpl implements RedisLockService {
     private RedisTemplate redisTemplate;
 
     @Override
-    public String getKeyWithThreadLocal(ProceedingJoinPoint joinPoint, RedisLock redisLock) {
-        String lockKey = redisLock.key();
-        if (StringUtil.isBlank(RedisLockUtil.get())) {
-            throw new RedisLockException("RedisLockUtil为空");
+    public String getKeyWithThreadLocal(ProceedingJoinPoint joinPoint, DistributedProxyLock distributedProxyLock) {
+        String lockKey = distributedProxyLock.key();
+        if (StringUtil.isBlank(DistributedProxyLockUtil.get())) {
+            throw new DistributedProxyLockException("DistributedProxyLockUtil为空");
         }
         return lockKey;
     }
 
 
     @Override
-    public String getKeyWithParam(ProceedingJoinPoint joinPoint, RedisLock redisLock) {
-        String objectName = redisLock.objectName();
+    public String getKeyWithParam(ProceedingJoinPoint joinPoint, DistributedProxyLock distributedProxyLock) {
+        String objectName = distributedProxyLock.objectName();
         if (StringUtil.isBlank(objectName)) {
-            throw new RedisLockException("objectName为空");
+            throw new DistributedProxyLockException("objectName为空");
         }
-        String paramName = redisLock.paramName();
+        String paramName = distributedProxyLock.paramName();
         Object[] args = joinPoint.getArgs();
         String[] objectNames = ((CodeSignature) joinPoint.getSignature()).getParameterNames();
         Map<String, Object> objectHashMap = new HashMap<>();
@@ -51,21 +51,21 @@ public class RedisLockKeyServiceImpl implements RedisLockService {
             objectHashMap.put(objectNames[i], args[i]);
         }
         if (!objectHashMap.containsKey(objectName)) {
-            throw new RedisLockException("入参不包含该对象" + objectName);
+            throw new DistributedProxyLockException("入参不包含该对象" + objectName);
         }
         Object o = objectHashMap.get(objectName);
         if (StringUtil.isBlank(paramName)) {
-            return redisLock.key() + o.toString();
+            return distributedProxyLock.key() + o.toString();
         }
-        String lockKey = redisLock.key() + RedisLockCommonUtil.getFieldValueByName(paramName, o);
+        String lockKey = distributedProxyLock.key() + DistributedProxyLockCommonUtil.getFieldValueByName(paramName, o);
         return lockKey;
     }
 
 
-    public Object lockBySpringRedis(String lockKey, ProceedingJoinPoint joinPoint, RedisLock redisLock) throws Throwable {
+    public Object lockBySpringRedis(String lockKey, ProceedingJoinPoint joinPoint, DistributedProxyLock distributedProxyLock) throws Throwable {
         try {
             if (redisTemplate.opsForValue().setIfAbsent(lockKey, lockKey)) {
-                redisTemplate.expire(lockKey, redisLock.executeOut(), redisLock.timeUnit());
+                redisTemplate.expire(lockKey, distributedProxyLock.executeOut(), distributedProxyLock.timeUnit());
                 log.debug("代理加锁成功:{}", lockKey);
                 return joinPoint.proceed();
             } else {
@@ -82,10 +82,10 @@ public class RedisLockKeyServiceImpl implements RedisLockService {
     }
 
 
-    public Object lockByRedisson(String lockKey, ProceedingJoinPoint joinPoint, RedisLock redisLock) throws Throwable {
+    public Object lockByRedisson(String lockKey, ProceedingJoinPoint joinPoint, DistributedProxyLock distributedProxyLock) throws Throwable {
         RLock lock = redissonClient.getLock(lockKey);
         try {
-            if (lock.tryLock(redisLock.waitOut(), redisLock.executeOut(), redisLock.timeUnit())) {
+            if (lock.tryLock(distributedProxyLock.waitOut(), distributedProxyLock.executeOut(), distributedProxyLock.timeUnit())) {
                 log.debug("代理加锁成功:{}", lockKey);
                 return joinPoint.proceed();
             } else {
@@ -100,9 +100,9 @@ public class RedisLockKeyServiceImpl implements RedisLockService {
                 log.debug("代理解锁:{}", lockKey);
             }
             //如果方法注解中开启自动清除，就去除
-            if (redisLock.atuoRemove()) {
-                RedisLockUtil.remove();
-                log.debug("自动清除RedisLockUtil:{}", lockKey);
+            if (distributedProxyLock.atuoRemove()) {
+                DistributedProxyLockUtil.remove();
+                log.debug("自动清除DistributedProxyLockUtil:{}", lockKey);
             }
         }
         return null;
