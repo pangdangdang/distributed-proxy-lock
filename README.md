@@ -6,7 +6,9 @@
 
 #### 软件架构
 
-https://gitee.com/tingmailang/distributed-proxy-lock/raw/master/src/main/resources/META-INF/%E4%BB%A3%E7%90%86%E9%94%81%E8%BF%87%E7%A8%8B.PNG
+### 演示图片
+![Image text](https://gitee.com/tingmailang/distributed-proxy-lock/raw/master/src/main/resources/META-INF/%E4%BB%A3%E7%90%86%E9%94%81%E8%BF%87%E7%A8%8B.PNG)
+
 
 SpringBoot，默认使用redisson链接redis，可以更改注解参数使用Spring redis工具
 
