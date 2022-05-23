@@ -1,7 +1,6 @@
 package com.annotation;
 
 import com.core.RedisLockCommonUtil;
-import com.enums.RedisLockSuffixKeyTypeEnum;
 
 import java.lang.annotation.*;
 import java.util.concurrent.TimeUnit;

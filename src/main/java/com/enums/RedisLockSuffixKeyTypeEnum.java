@@ -2,7 +2,6 @@ package com.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -10,7 +9,6 @@ import java.util.Optional;
 /**
  * @Author: tingmailang
  */
-@Slf4j
 @Getter
 public enum RedisLockSuffixKeyTypeEnum {
     NO_SUFFIX("no_suffix", "没有后缀"),

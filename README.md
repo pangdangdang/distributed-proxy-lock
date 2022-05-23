@@ -46,7 +46,7 @@ redis注册(spring.redis)：
 
 #### 使用说明
 
-1.  无后缀
+1.  无后缀（redisson加锁）
 
     @RedisLock(key = "SHOP_LOCK_KEY")   
     public void test(ShopChainDTO shopChainDTO) {   
@@ -55,7 +55,7 @@ redis注册(spring.redis)：
         }   
     }   
     
-2.  参数中获取
+2.  参数中获取（redisson加锁）
 
     ①从某个入参对象的某个参数获取
     
@@ -80,7 +80,7 @@ redis注册(spring.redis)：
             }   
         }   
         
-3.  使用ThreadLocal获取
+3.  使用ThreadLocal获取（redisson加锁）
 
     @Slf4j  
     @Service    
@@ -88,6 +88,75 @@ redis注册(spring.redis)：
     
         @RedisLock(key = "SHOP_LOCK_KEY", 
             suffixKeyTypeEnum = RedisLockCommonUtil.THREAD_LOCAL) 
+        public void test(ShopChainDTO shopChainDTO) {   
+            for (int i = 0; i < 6; i++) {   
+                log.info("测试加锁:{}", LockUtil.get() + i);    
+            }   
+        }   
+        
+    }
+    
+    @RestController 
+    @RequestMapping("shop") 
+    public class ShopController {   
+        
+        @Resource   
+        private ShopService shopService;    
+
+        @PostMapping("/online") 
+        @MethodLogger   
+        public void run(@RequestBody @Validated ShopChainDTO dto) { 
+            LockUtil.set(dto.getShopId());  
+            shopService.test(dto);  
+        }
+    }
+    
+4.  无后缀（Spring redis加锁）
+
+    @RedisLock(key = "SHOP_LOCK_KEY",
+        redisEnum = RedisLockCommonUtil.SPRING_REDIS)   
+    public void test(ShopChainDTO shopChainDTO) {   
+        for (int i = 0; i < 6; i++) {   
+            log.info("测试加锁:{}", LockUtil.get() + i);    
+        }   
+    }   
+    
+5.  参数中获取（Spring redis加锁）
+
+    ①从某个入参对象的某个参数获取
+    
+        @RedisLock(key = "SHOP_LOCK_KEY", 
+            suffixKeyTypeEnum = RedisLockCommonUtil.PARAM,
+            objectName = "shopChainDTO",
+            paramName = "shopId",
+            redisEnum = RedisLockCommonUtil.SPRING_REDIS)   
+        public void test(ShopChainDTO shopChainDTO) {   
+            for (int i = 0; i < 6; i++) {   
+                log.info("测试加锁:{}", LockUtil.get() + i);    
+            }   
+        }   
+        
+    ②从某个入参对象获取
+    
+        @RedisLock(key = "SHOP_LOCK_KEY", 
+            suffixKeyTypeEnum = RedisLockCommonUtil.PARAM,
+            objectName = "shopId",
+            redisEnum = RedisLockCommonUtil.SPRING_REDIS)  
+        public void test(LocalDateTime onlineTime, String shopId) { 
+            for (int i = 0; i < 6; i++) {   
+                log.info("测试加锁:{}", LockUtil.get() + i);    
+            }   
+        }   
+        
+6.  使用ThreadLocal获取（Spring redis加锁）
+
+    @Slf4j  
+    @Service    
+    public class ShopServiceImpl implements ShopService {   
+    
+        @RedisLock(key = "SHOP_LOCK_KEY", 
+            suffixKeyTypeEnum = RedisLockCommonUtil.THREAD_LOCAL,
+             redisEnum = RedisLockCommonUtil.SPRING_REDIS) 
         public void test(ShopChainDTO shopChainDTO) {   
             for (int i = 0; i < 6; i++) {   
                 log.info("测试加锁:{}", LockUtil.get() + i);    

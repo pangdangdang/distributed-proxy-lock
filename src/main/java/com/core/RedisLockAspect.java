@@ -5,7 +5,6 @@ import com.core.inter.RedisLockService;
 import com.enums.RedisEnum;
 import com.enums.RedisLockSuffixKeyTypeEnum;
 import com.exception.RedisLockException;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
