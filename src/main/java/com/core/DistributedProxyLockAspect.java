@@ -2,7 +2,7 @@ package com.core;
 
 import com.annotation.DistributedProxyLock;
 import com.core.inter.DistributedProxyLockService;
-import com.enums.RedisEnum;
+import com.enums.LockConnectionEnum;
 import com.enums.DistributedProxyLockSuffixKeyTypeEnum;
 import com.exception.DistributedProxyLockException;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -49,14 +49,14 @@ public class DistributedProxyLockAspect {
             throw new DistributedProxyLockException("获取后缀key失败" + e);
         }
 
-        RedisEnum redisEnum = RedisEnum.of(distributedProxyLock.redisEnum());
-        switch (redisEnum) {
+        LockConnectionEnum lockConnectionEnum = LockConnectionEnum.of(distributedProxyLock.lockConnectionEnum());
+        switch (lockConnectionEnum) {
             case REDISSON:
                 return redisLockService.lockByRedisson(lockKey, joinPoint, distributedProxyLock);
             case SPRING_REDIS:
                 return redisLockService.lockBySpringRedis(lockKey, joinPoint, distributedProxyLock);
             default:
-                throw new DistributedProxyLockException("未知redis工具" + distributedProxyLock.redisEnum());
+                throw new DistributedProxyLockException("未知redis工具" + distributedProxyLock.lockConnectionEnum());
         }
     }
 

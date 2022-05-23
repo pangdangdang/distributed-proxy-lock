@@ -17,5 +17,5 @@ public @interface DistributedProxyLock {
     String suffixKeyTypeEnum() default DistributedProxyLockCommonUtil.NO_SUFFIX;
     String objectName() default "";
     String paramName() default "";
-    String redisEnum() default DistributedProxyLockCommonUtil.REDISSON;
+    String lockConnectionEnum() default DistributedProxyLockCommonUtil.REDISSON;
 }
