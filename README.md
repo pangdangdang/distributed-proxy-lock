@@ -1,4 +1,4 @@
-# redislock
+# distributed-proxy-lock
 
 #### 介绍
 
