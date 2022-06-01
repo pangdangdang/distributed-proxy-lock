@@ -1,10 +1,8 @@
 package com.exception;
 
 /**
- * Desc...
  *
- * @author Charley Wu
- * @date 2021/8/26
+ * @author tingmailang
  */
 public class DistributedProxyLockException extends RuntimeException {
   public DistributedProxyLockException() {
