@@ -58,7 +58,7 @@ public class DistributedProxyLockKeyServiceImpl implements DistributedProxyLockS
         }
         Object o = objectHashMap.get(objectName);
         if (StringUtil.isBlank(paramName)) {
-            return distributedProxyLock.key() + o.toString();
+            return distributedProxyLock.key() + o;
         }
         String lockKey = distributedProxyLock.key() + DistributedProxyLockCommonUtil.getFieldValueByName(paramName, o);
         return lockKey;
