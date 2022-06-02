@@ -16,6 +16,6 @@ public @interface DistributedProxyLock {
     boolean atuoRemove() default true;
     String suffixKeyTypeEnum() default DistributedProxyLockCommonUtil.NO_SUFFIX;
     String objectName() default "";
-    String paramName() default "";
+    String[] paramName() default {};
     String lockConnectionEnum() default DistributedProxyLockCommonUtil.REDISSON;
 }

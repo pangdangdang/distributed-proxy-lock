@@ -66,7 +66,7 @@ redis注册(spring.redis)：
         @DistributedProxyLock(key = "SHOP_LOCK_KEY", 
             suffixKeyTypeEnum = DistributedProxyLockCommonUtil.PARAM,
             objectName = "shopChainDTO",
-            paramName = "shopId")   
+            paramName = {"shopId"})   
         public void test(ShopChainDTO shopChainDTO) {   
             for (int i = 0; i < 6; i++) {   
                 log.info("测试加锁:{}", DistributedProxyLockUtil.get() + i);    
@@ -132,7 +132,7 @@ redis注册(spring.redis)：
         @DistributedProxyLock(key = "SHOP_LOCK_KEY", 
             suffixKeyTypeEnum = DistributedProxyLockCommonUtil.PARAM,
             objectName = "shopChainDTO",
-            paramName = "shopId",
+            paramName = {"shopId"},   
             lockConnectionEnum = DistributedProxyLockCommonUtil.SPRING_REDIS)   
         public void test(ShopChainDTO shopChainDTO) {   
             for (int i = 0; i < 6; i++) {   

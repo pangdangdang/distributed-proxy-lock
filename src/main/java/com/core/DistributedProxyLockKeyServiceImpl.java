@@ -46,7 +46,7 @@ public class DistributedProxyLockKeyServiceImpl implements DistributedProxyLockS
         if (StringUtil.isBlank(objectName)) {
             throw new DistributedProxyLockException("objectName为空");
         }
-        String paramName = distributedProxyLock.paramName();
+        String[] paramName = distributedProxyLock.paramName();
         Object[] args = joinPoint.getArgs();
         String[] objectNames = ((CodeSignature) joinPoint.getSignature()).getParameterNames();
         Map<String, Object> objectHashMap = new HashMap<>();
@@ -57,10 +57,13 @@ public class DistributedProxyLockKeyServiceImpl implements DistributedProxyLockS
             throw new DistributedProxyLockException("入参不包含该对象" + objectName);
         }
         Object o = objectHashMap.get(objectName);
-        if (StringUtil.isBlank(paramName)) {
+        if (paramName == null || paramName.length == 0) {
             return distributedProxyLock.key() + o;
         }
-        String lockKey = distributedProxyLock.key() + DistributedProxyLockCommonUtil.getFieldValueByName(paramName, o);
+        String lockKey = distributedProxyLock.key();
+        for (int i = 0; i < paramName.length; i++) {
+            lockKey += DistributedProxyLockCommonUtil.getFieldValueByName(paramName[i], o);
+        }
         return lockKey;
     }
 
